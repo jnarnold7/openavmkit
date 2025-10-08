@@ -4,7 +4,7 @@ FROM python:3.11 AS builder
 WORKDIR /app
 
 # Copy all of OpenAVMKit's build files into the container (excluding those in .dockerignore)
-COPY . ./
+COPY --chown=${NB_USER}:${NB_GID} . .
 
 # Ensure that the entrypoint script is executable
 RUN chmod +x ./simple-entrypoint.sh
@@ -12,8 +12,7 @@ RUN chmod +x ./simple-entrypoint.sh
 # --no-cache-dir is used to avoid caching packages, shrinking the image size
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install local openavmkit package
-RUN pip install .
+# ----------------------------------------------------------------------------------------------------------------
 
 # Seperately install jupyter (as specified on the openavmkit docs)
 RUN pip install jupyter
@@ -27,5 +26,6 @@ ENTRYPOINT ["./simple-entrypoint.sh"]
 
 LABEL maintainer="Jackson Arnold <jackson.n.arnold@gmail.com>"
 
-# Future updates:
-# - Create all the dependencies in a distro environment, then move it to a distroless with the root file being /notebooks/ (no need for anything outside of that)
+# Add in tini to entrypoint.sh
+# Fix authentication
+# Configure so that it can work behind a proxy
